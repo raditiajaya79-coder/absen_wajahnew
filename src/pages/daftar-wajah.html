@@ -39,6 +39,26 @@
         #exportData {
             display: none;
         }
+
+    /* Tambahkan di <style> section */
+.main-content {
+    background: linear-gradient(135deg, #1a1d29 0%, #2d1b3d 100%);
+    position: relative;
+}
+
+.main-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+}
     </style>
 </head>
 <body class="font-sans bg-gray-900 min-h-screen text-white relative">
