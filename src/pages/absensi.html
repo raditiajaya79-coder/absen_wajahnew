@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Absensi Biometrik Realtime</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .title-gradient {
+            background-image: linear-gradient(90deg, #1D4ED8 0%, #06B6D4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        #attendanceVideo {
+            aspect-ratio: 4/3;
+            width: 100%;
+            max-width: 640px;
+            border-radius: 0.75rem;
+            border: 2px solid #1D4ED8;
+            box-shadow: 0 0 10px rgba(29, 78, 216, 0.4);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 0.5rem 1rem;
+            align-items: center;
+        }
+
+        .data-label {
+            font-weight: 500;
+            color: #9CA3AF;
+            text-align: left;
+        }
+
+        .data-value {
+            font-weight: 700;
+            color: #E5E7EB;
+            text-align: right;
+        }
+
+        .status-bar {
+            border-bottom: 2px solid #1D4ED8;
+        }
+
+        .time-block-precise {
+            background-color: #0F172A;
+            border: 1px solid #1E293B;
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 🔑 Lebar horizontal diperpanjang, tinggi diperpendek */
+            padding: 0.5rem 1.5rem;
+            /* Atas/bawah: 8px | Kiri/kanan: 24px */
+            min-height: 3.5rem;
+            /* 56px — cukup untuk teks, tapi lebih pendek */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #currentClock {
+            font-size: 2rem;
+            /* 32px — cukup dominan tapi tidak berlebihan */
+            font-weight: 800;
+            color: #A3E635;
+            line-height: 1.1;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        #currentDayDate {
+            font-size: 1.125rem;
+            /* 18px */
+            font-weight: 700;
+            color: #06B6D4;
+            line-height: 1.25;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Di layar lebar (≥1280px), sedikit perbesar */
+        @media (min-width: 1280px) {
+            .time-block-precise {
+                padding: 0.5rem 2rem;
+                /* kiri/kanan: 32px */
+            }
+
+            #currentClock {
+                font-size: 2.25rem;
+            }
+
+            #currentDayDate {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-gray-950 min-h-screen text-white relative">
+
+    <div class="fixed inset-0 bg-gray-950 z-0"></div>
+
+    <div class="relative z-10 flex w-full min-h-screen justify-center items-center p-2 sm:p-4">
+        <main
+            class="bg-gray-900/95 backdrop-blur-sm rounded-xl w-full max-w-5xl overflow-hidden shadow-2xl border border-gray-800">
+
+            <header class="p-3 sm:p-4 md:p-6 text-center border-b border-gray-800 relative">
+                <button id="logoutButton"
+                    class="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 text-red-400 hover:text-red-300 text-[0.65rem] sm:text-xs md:text-sm font-medium transition duration-150 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 12H2m0 0l3-3m-3 3l3 3m13-3v8a2 2 0 01-2 2h-6a2 2 0 01-2-2v-8m10-4V4a2 2 0 00-2-2h-6a2 2 0 00-2 2v4" />
+                    </svg>
+                    <span class="hidden sm:inline">Logout</span>
+                </button>
+                <h1 class="text-xl sm:text-3xl md:text-5xl font-extrabold tracking-tight title-gradient px-2">
+                    ABSENSI WAJAH
+                </h1>
+                <p class="text-xs sm:text-sm md:text-xl text-gray-400 font-light mt-1 px-2">Sistem Verifikasi Biometrik
+                </p>
+            </header>
+
+            <section class="p-4 sm:p-6 md:p-8">
+
+                <!-- Jam & Tanggal - Rapi di Mobile & Desktop -->
+                <div class="mb-8 flex justify-center px-4 sm:px-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-4xl">
+                        <div class="time-block-precise">
+                            <p id="currentClock" class="font-mono">19:49:19</p>
+                        </div>
+                        <div class="time-block-precise">
+                            <p id="currentDayDate" class="font-mono">Rabu, 19 November 2025</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🔑 Layout utama: 1 kolom di mobile, 5 kolom (3+2) di lg+ -->
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8">
+
+                    <div class="camera-feed lg:col-span-3 flex flex-col items-center">
+                        <h2 class="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-300">Arahkan Wajah Anda</h2>
+                        <div class="w-full max-w-lg relative">
+                            <video id="attendanceVideo" autoplay muted class="bg-black"></video>
+                            <canvas id="attendanceCanvas" class="hidden"></canvas>
+
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span id="scanningOverlay"
+                                    class="text-lg sm:text-2xl font-bold tracking-wider text-white/80 bg-black/60 px-4 py-2 sm:px-6 sm:py-3 rounded-full border border-blue-400/50"
+                                    style="display: none;">
+                                    MEMINDAI...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="attendance-status lg:col-span-2 flex flex-col">
+                        <div class="status-bar pb-2 sm:pb-3 mb-4 sm:mb-6">
+                            <h2 class="text-lg sm:text-xl font-semibold text-gray-300">DATA VERIFIKASI</h2>
+                        </div>
+
+                        <div class="bg-gray-800/50 p-4 sm:p-6 rounded-xl border border-gray-800 shadow-inner flex-grow">
+                            <div class="mb-6 sm:mb-8 p-3 rounded bg-gray-900/70 border border-gray-700">
+                                <p class="text-xs sm:text-sm data-label">Status Saat Ini:</p>
+                                <p id="statusMessage" class="text-lg sm:text-xl font-extrabold text-blue-400 mt-1">
+                                    SISTEM SIAP
+                                </p>
+                            </div>
+
+                            <div class="space-y-3 sm:space-y-4">
+                                <div class="data-grid border-b border-gray-700 pb-2 sm:pb-3">
+                                    <p class="data-label text-sm">Nama Pegawai</p>
+                                    <p id="detectedName" class="data-value text-lg sm:text-xl text-cyan-300">-</p>
+                                </div>
+                                <div class="data-grid border-b border-gray-700 pb-2 sm:pb-3">
+                                    <p class="data-label text-sm">ID Karyawan</p>
+                                    <p id="detectedId" class="data-value text-base sm:text-lg font-mono text-gray-300">-
+                                    </p>
+                                </div>
+                                <div class="data-grid border-b border-gray-700 pb-2 sm:pb-3">
+                                    <p class="data-label text-sm">Waktu Absen</p>
+                                    <p id="detectedTime"
+                                        class="data-value text-base sm:text-lg font-bold text-green-400">-</p>
+                                </div>
+                                <div class="data-grid border-b border-gray-700 pb-2 sm:pb-3">
+                                    <p class="data-label text-sm">Tanggal Absen</p>
+                                    <p id="detectedDate"
+                                        class="data-value text-base sm:text-lg font-bold text-blue-400">-</p>
+                                </div>
+                                <div class="data-grid">
+                                    <p class="data-label text-sm">Keterangan Absen</p>
+                                    <p id="detectedKeterangan"
+                                        class="data-value text-base sm:text-lg font-bold text-yellow-400">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Absen Manual Section -->
+                <div id="manualAbsenSection"
+                    class="mt-6 sm:mt-8 p-4 sm:p-6 bg-gray-800/50 rounded-xl border border-gray-800 shadow-inner"
+                    style="display: none;">
+                    <h3 class="text-lg sm:text-xl font-semibold text-gray-300 mb-3 sm:mb-4">Absen Manual</h3>
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                        <input type="text" id="manualIdInput" placeholder="Masukkan ID/NIS"
+                            class="flex-grow px-3 py-2 sm:px-4 sm:py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                        <button id="manualAbsenButton"
+                            class="px-4 py-2 sm:px-6 sm:py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition duration-200 text-sm sm:text-base whitespace-nowrap">Absen
+                            Sekarang</button>
+                    </div>
+                    <p class="mt-2 text-xs sm:text-sm text-gray-400">Opsional: Jika deteksi wajah gagal, Anda dapat
+                        absen manual dengan ID/NIS</p>
+                </div>
+
+                <div class="mt-3 sm:mt-4 text-center">
+                    <button id="toggleManualAbsen"
+                        class="px-4 py-2 sm:px-6 sm:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition duration-200 text-sm sm:text-base">Aktifkan
+                        Absen Manual</button>
+                </div>
+
+                <script>
+                    // JS for Date and Time display (The 'Sempurna' part)
+                    function updateDateTime() {
+                        const now = new Date();
+
+                        // Format Hari dan Tanggal
+                        const dayOptions = { weekday: 'long' };
+                        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+                        const dayDateString = now.toLocaleDateString('id-ID', dayOptions) + ', ' + now.toLocaleDateString('id-ID', dateOptions);
+
+                        // Format Jam (with seconds, 24-hour format)
+                        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                        const clockString = now.toLocaleTimeString('id-ID', timeOptions);
+
+                        document.getElementById('currentDayDate').textContent = dayDateString;
+                        document.getElementById('currentClock').textContent = clockString;
+                    }
+
+                    // Placeholder logic for the 'SCANNING' overlay and Status Bar Color
+                    function updateStatusVisuals(statusText, name, id, keterangan) {
+                        const statusEl = document.getElementById('statusMessage');
+                        const scanningOverlay = document.getElementById('scanningOverlay');
+                        const nameEl = document.getElementById('detectedName');
+                        const idEl = document.getElementById('detectedId');
+                        const timeEl = document.getElementById('detectedTime');
+                        const dateEl = document.getElementById('detectedDate');
+                        const ketEl = document.getElementById('detectedKeterangan');
+
+                        // Pastikan elemen ada sebelum mengakses
+                        if (statusEl) {
+                            statusEl.textContent = statusText;
+                            statusEl.className = 'text-xl font-extrabold mt-1';
+                        }
+                        if (scanningOverlay) {
+                            scanningOverlay.style.display = 'none';
+                        }
+                        if (nameEl) {
+                        }
+                        if (timeEl) {
+                            timeEl.textContent = '-';
+                        }
+                        if (dateEl) {
+                            dateEl.textContent = '-';
+                        }
+                        if (ketEl) {
+                            ketEl.textContent = keterangan || '-';
+                        }
+
+                        if (statusEl && scanningOverlay) {
+                            if (statusText.includes('Menunggu') || statusText.includes('MEMINDAI')) {
+                                statusEl.classList.add('text-yellow-400');
+                                scanningOverlay.style.display = 'block';
+                            } else if (statusText.includes('TERDETEKSI') || statusText.includes('Berhasil')) {
+                                statusEl.classList.add('text-green-400');
+                                if (ketEl) {
+                                    ketEl.classList.remove('text-yellow-400', 'text-red-400');
+                                    ketEl.classList.add('text-green-400'); // Keterangan becomes green on success
+                                }
+                            } else if (statusText.includes('Gagal') || statusText.includes('Tidak Dikenal')) {
+                                statusEl.classList.add('text-red-400');
+                                if (ketEl) {
+                                    ketEl.classList.remove('text-yellow-400', 'text-green-400');
+                                    ketEl.classList.add('text-red-400'); // Keterangan becomes red on failure
+                                }
+                            } else {
+                                statusEl.classList.add('text-blue-400'); // Default (SISTEM SIAP)
+                                if (ketEl) {
+                                    ketEl.classList.add('text-yellow-400'); // Default Keterangan color
+                                }
+                            }
+                        }
+                    }
+
+
+                    // --- Initialization ---
+                    updateDateTime();
+                    updateStatusVisuals('Sistem Siap');
+
+                    setInterval(() => {
+                        updateDateTime();
+                        // Example demo logic:
+                        // updateStatusVisuals('Menunggu deteksi wajah...');
+                    }, 1000);
+                </script>
+
+                <script>
+                    // Fungsi untuk mengontrol tampilan absen manual
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('toggleManualAbsen').addEventListener('click', function () {
+                            const manualSection = document.getElementById('manualAbsenSection');
+                            if (manualSection.style.display === 'none') {
+                                manualSection.style.display = 'block';
+                                this.textContent = 'Sembunyikan Absen Manual';
+                            } else {
+                                manualSection.style.display = 'none';
+                                this.textContent = 'Aktifkan Absen Manual';
+                            }
+                        });
+                    });
+                </script>
+
+                <script>
+                    // Tambahkan logout functionality
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const logoutButton = document.getElementById('logoutButton');
+                        if (logoutButton) {
+                            logoutButton.addEventListener('click', function () {
+                                // Clear any session data if needed
+                                // For now, we'll just redirect to index.html
+                                window.location.href = '../index.html';
+                            });
+                        }
+
+                        // Fungsi untuk mengontrol tampilan absen manual
+                        document.getElementById('toggleManualAbsen').addEventListener('click', function () {
+                            const manualSection = document.getElementById('manualAbsenSection');
+                            if (manualSection.style.display === 'none') {
+                                manualSection.style.display = 'block';
+                                this.textContent = 'Sembunyikan Absen Manual';
+                            } else {
+                                manualSection.style.display = 'none';
+                                this.textContent = 'Aktifkan Absen Manual';
+                            }
+                        });
+
+                        // Event listener untuk absen manual
+                        document.getElementById('manualAbsenButton').addEventListener('click', function () {
+                            const manualId = document.getElementById('manualIdInput').value.trim();
+                            if (!manualId) {
+                                statusMessage.textContent = "Silakan masukkan ID/NIS terlebih dahulu";
+                                statusMessage.style.color = 'red';
+                                return;
+                            }
+
+                            // Cari pengguna berdasarkan ID
+                            const registeredFace = registeredFaces.find(face => face.idNumber === manualId);
+                            if (!registeredFace) {
+                                statusMessage.textContent = "ID/NIS tidak ditemukan";
+                                statusMessage.style.color = 'red';
+                                return;
+                            }
+
+                            // Lakukan absensi manual
+                            const now = new Date();
+                            const attendanceTime = now.toLocaleTimeString('id-ID', { hour12: false });
+                            const attendanceDate = now.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+                            const todayISO = now.toISOString().slice(0, 10);
+
+                            let attendanceStatus = 'Hadir'; // Default status
+                            let displayStatus = 'Hadir';
+
+                            // Check for custom schedule
+                            if (registeredFace.arrivalTime && registeredFace.departureTime) {
+                                const arrivalTime = registeredFace.arrivalTime;
+                                const departureTime = registeredFace.departureTime;
+
+                                const currentHour = now.getHours();
+                                const currentMinute = now.getMinutes();
+                                const [arrivalHour, arrivalMinute] = arrivalTime.split(':').map(Number);
+                                const [departureHour, departureMinute] = departureTime.split(':').map(Number);
+
+                                const currentTimeInMinutes = currentHour * 60 + currentMinute;
+                                const arrivalTimeInMinutes = arrivalHour * 60 + arrivalMinute;
+                                const departureTimeInMinutes = departureHour * 60 + departureMinute;
+
+                                // Aturan keterangan absen yang benar:
+                                // ≤ jam datang → Hadir
+                                // > jam datang → Terlambat
+                                // ≥ jam pulang → Pulang
+                                if (currentTimeInMinutes <= arrivalTimeInMinutes) {
+                                    attendanceStatus = 'Hadir';
+                                    displayStatus = 'Hadir';
+                                } else if (currentTimeInMinutes > arrivalTimeInMinutes && currentTimeInMinutes < departureTimeInMinutes) {
+                                    attendanceStatus = 'Terlambat';
+                                    displayStatus = 'Terlambat';
+                                } else if (currentTimeInMinutes >= departureTimeInMinutes) {
+                                    attendanceStatus = 'Pulang';
+                                    displayStatus = 'Pulang';
+                                }
+                            } else {
+                                // Default logic if no custom schedule
+                                const defaultArrivalTime = '08:00'; // Default jam datang
+                                const defaultDepartureTime = '16:00'; // Default jam pulang
+
+                                const [defaultArrivalHour, defaultArrivalMinute] = defaultArrivalTime.split(':').map(Number);
+                                const [defaultDepartureHour, defaultDepartureMinute] = defaultDepartureTime.split(':').map(Number);
+
+                                const currentHour = now.getHours();
+                                const currentMinute = now.getMinutes();
+                                const currentTimeInMinutes = currentHour * 60 + currentMinute;
+                                const defaultArrivalTimeInMinutes = defaultArrivalHour * 60 + defaultArrivalMinute;
+                                const defaultDepartureTimeInMinutes = defaultDepartureHour * 60 + defaultDepartureMinute;
+
+                                // Aturan keterangan absen yang benar:
+                                // ≤ jam datang → Hadir
+                                // > jam datang → Terlambat
+                                // ≥ jam pulang → Pulang
+                                if (currentTimeInMinutes <= defaultArrivalTimeInMinutes) {
+                                    attendanceStatus = 'Hadir';
+                                    displayStatus = 'Hadir';
+                                } else if (currentTimeInMinutes > defaultArrivalTimeInMinutes && currentTimeInMinutes < defaultDepartureTimeInMinutes) {
+                                    attendanceStatus = 'Terlambat';
+                                    displayStatus = 'Terlambat';
+                                } else if (currentTimeInMinutes >= defaultDepartureTimeInMinutes) {
+                                    attendanceStatus = 'Pulang';
+                                    displayStatus = 'Pulang';
+                                }
+                            }
+
+                            // Cek apakah sudah absen hari ini
+                            const hasAttendedToday = attendanceRecords.some(record =>
+                                record.idNumber === registeredFace.idNumber && record.date === todayISO
+                            );
+
+                            if (hasAttendedToday) {
+                                statusMessage.textContent = `Anda sudah absen hari ini, ${registeredFace.fullName}.`;
+                                statusMessage.style.color = 'orange';
+                                return;
+                            }
+
+                            const newRecord = {
+                                id: Date.now().toString(),
+                                fullName: registeredFace.fullName,
+                                idNumber: registeredFace.idNumber,
+                                time: attendanceTime,
+                                date: todayISO,
+                                status: attendanceStatus
+                            };
+
+                            attendanceRecords.push(newRecord);
+                            localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
+
+                            // Hanya menampilkan pesan sukses tanpa status detail
+                            statusMessage.textContent = `Absensi berhasil untuk ${registeredFace.fullName}`;
+                            statusMessage.style.color = 'green';
+                            detectedName.textContent = registeredFace.fullName;
+                            detectedId.textContent = registeredFace.idNumber;
+                            detectedTime.textContent = attendanceTime;
+                            // detectedDate tidak ada di HTML, jadi tidak perlu di-set
+                            detectedKeterangan.textContent = displayStatus;
+
+                            // Perbarui data dashboard di LocalStorage
+                            updateDashboardSummary();
+
+                            // Kosongkan input ID setelah absen
+                            document.getElementById('manualIdInput').value = '';
+                        });
+                    });
+                </script>
+        </main>
+    </div>
+
+    <script src="../skrip-absensi.js"></script>
+</body>
+
+</html>

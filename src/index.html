@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absen-Wajah</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            color: #fff;
+            position: relative;
+        }
+        
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        .content {
+            flex-grow: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* BATAS MAKSIMUM untuk layar besar agar konten tidak terlalu melebar */
+            max-width: 1200px; 
+            margin: 0 auto; 
+            width: 100%;
+        }
+        
+        /* LOGO - Penempatan di Pojok KIRI Atas (Diperbarui) */
+        .logo-container {
+            position: absolute; 
+            top: 2rem; 
+            left: 2rem; 
+            z-index: 10; 
+            opacity: 0;
+            transform: translateX(-20px); 
+            animation: fadeInLeft 1s ease 2s forwards; 
+        }
+
+        /* Keyframes baru untuk muncul dari kiri */
+        @keyframes fadeInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .logo-container img {
+            width: 70px; /* Ukuran default logo: 70px */
+            height: auto;
+            border-radius: 50%; 
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); 
+            /* Logo sudah responsif karena ukurannya dikendalikan oleh media queries di bawah */
+        }
+
+        /* HEADER - ANIMASI SLOMO & SCALING */
+        header {
+            text-align: center;
+            margin-bottom: 7.5rem; 
+            position: relative;
+            opacity: 0;
+            transform: scale(0.85); 
+            animation: fadeInScaleUp 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        
+        @keyframes fadeInScaleUp {
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Glow effect behind title */
+        header::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 25rem; 
+            height: 25rem; 
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            filter: blur(60px);
+            z-index: -1;
+        }
+        
+        /* JUDUL UTAMA - Skala Font Responsif */
+        header h1 {
+            /* Skala font berdasarkan viewport dan batas minimum (fallback) */
+            font-size: clamp(3.5rem, 8vw, 5.5rem); 
+            margin-bottom: 1.5rem; 
+            font-weight: 800;
+            letter-spacing: -4px; 
+            background: linear-gradient(135deg, #ffffff 0%, #3b82f6 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            line-height: 1.1;
+        }
+        
+        header p {
+            color: #8a8a8a;
+            font-size: 1.1rem; 
+            font-weight: 500;
+            letter-spacing: 4px; 
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+            padding: 0 30px;
+        }
+        
+        /* Lines on sides of subtitle */
+        header p::before,
+        header p::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 3rem; 
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #3b82f6);
+        }
+        
+        header p::before {
+            right: 100%;
+            margin-right: 15px;
+        }
+        
+        header p::after {
+            left: 100%;
+            margin-left: 15px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+        }
+        
+        .landing-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* BUTTON CONTAINER - ANIMASI SLOMO & TRANSLATE */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem; 
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px); 
+            animation: fadeInTranslateUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s forwards;
+        }
+
+        @keyframes fadeInTranslateUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* TOMBOL - Ukuran Responsif */
+        .btn {
+            padding: 1.125rem 3.5rem; 
+            border-radius: 10px; 
+            text-decoration: none;
+            font-size: 1rem; 
+            font-weight: 600; 
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            /* Lebar tombol responsif, maksimal 320px */
+            width: clamp(250px, 80vw, 320px); 
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .btn-primary {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background: #252525; 
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-3px); 
+        }
+        
+        .btn-secondary {
+            background: #ffffff;
+            color: #0a0a0a;
+            border: 1px solid #ffffff;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e5e5;
+            transform: translateY(-3px); 
+        }
+        
+        /* MEDIA QUERIES untuk penyesuaian di layar yang lebih kecil */
+        
+        /* Untuk layar kecil (Ponsel) */
+        @media (max-width: 600px) {
+            html {
+                font-size: 14px; 
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            .logo-container {
+                top: 1rem; 
+                left: 1rem; 
+            }
+
+            .logo-container img {
+                width: 60px; /* Ukuran logo di mobile: 60px */
+            }
+
+            header {
+                margin-bottom: 5rem;
+            }
+
+            header p {
+                font-size: 0.9rem;
+                letter-spacing: 3px;
+                padding: 0 10px;
+            }
+            
+            header p::before,
+            header p::after {
+                width: 1.5rem; 
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            
+            .btn {
+                padding: 1rem 2.5rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Untuk layar Tablet (Horizontal) dan layar menengah */
+        @media (min-width: 601px) and (max-width: 1024px) {
+             html {
+                font-size: 15px; 
+            }
+             header {
+                margin-bottom: 6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+           <img src="../public/logo-pgri.png" alt="SMK PGRI 1 Kediri Logo" style="max-width: 100px; height: auto; border-radius: 50%;">
+        </div>
+
+        <main class="content">
+            <header>
+                <h1>Absen Wajah</h1>
+                <p>Sistem Absensi Wajah Otomatis</p>
+            </header>
+            
+            <section class="landing-section">
+                <div class="button-container">
+                    <a href="dashboard.html" class="btn btn-primary">Dashboard Admin</a>
+                    <a href="pages/absensi.html" class="btn btn-secondary">Absensi Wajah</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

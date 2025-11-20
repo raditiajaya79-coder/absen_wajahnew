@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceLite - Daftar Wajah Terdaftar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../gaya.css">
+    <style>
+        /* Custom styles to match the theme */
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #1f2937, #111827); /* Darker gradient */
+        }
+        .active-link {
+            /* Menerapkan efek border aktif di sidebar */
+            border-image-slice: 1;
+            border-image-source: linear-gradient(to right, #6366f1, #c084fc);
+            border-left: 4px solid transparent;
+        }
+        .header-bg {
+            background-color: #1f2937; /* Slightly lighter gray for contrast */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .card-bg {
+            background-color: #1f2937;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+        }
+        /* Style input yang lebih halus dan LEBIH KECIL */
+        .input-style {
+            background-color: #2c3541 !important;
+            border-color: #4b5563 !important;
+            padding: 0.5rem 1rem; /* Padding Diperkecil menjadi 0.5rem */
+        }
+        /* Style untuk efek fokus yang lebih menonjol */
+        .input-style:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Ring fokus biru muda */
+        }
+        /* Menyembunyikan tombol Export Data sementara di sidebar */
+        #exportData {
+            display: none;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-900 min-h-screen text-white relative">
+    <div class="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgZmlsbD0ibm9uZSIgZmlsbC1vcGFjaXR5PSIwLjA0Ij4KICAgIDxwYXRoIGQ9Ik0wIDAgTCA1MCAwIE0gMCA1MCBMIDUwIDUwIiBzdHJva2U9IiM5M2E0ZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8cGF0aCBkPSJNMCAwIEwgNTAgMCBNIDUwIDAgTCA1MCA1MCIgc3Ryb2tlPSIjOTNhNGZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDwvZz4KPC9zdmc+')] z-0"></div>
+    <div class="flex-wrapper relative z-10 w-full min-h-screen">
+        <div id="sidebar-placeholder"></div>
+        <main id="main-content" class="main-content p-10 bg-gray-800">
+            <div class="container-desktop">
+                <header class="header-bg p-4 rounded-lg mb-4 shadow-xl flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button id="sidebarToggleButton" class="sidebar-toggle p-2 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none mr-4 md:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <h2 class="text-xl font-semibold text-white">Daftar Wajah Terdaftar</h2>
+                    </div>
+                <button id="logoutButton"
+                    class="text-red-400 hover:text-red-300 text-sm font-medium transition duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span class="hidden sm:inline">Logout</span>
+                </button>
+                </header>
+                
+                <section class="face-list-section">
+                    
+                    <div class="controls flex flex-col sm:flex-row items-center justify-between gap-3 p-2 card-bg rounded-xl mb-3 shadow-xl">
+                        <input type="text" id="searchInput" placeholder="Cari nama atau ID..." class="px-3 py-1.5 rounded-lg input-style text-sm text-white border focus:border-purple-500 focus:outline-none w-full sm:flex-grow sm:max-w-sm" style="min-width: 200px;">
+                        
+                        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                            <select id="sortSelect" class="rounded-lg input-style text-sm text-white border focus:border-purple-500 focus:outline-none cursor-pointer w-full sm:w-auto">
+                                <option value="nameAsc" class="bg-gray-700">Sortir: Nama (A-Z)</option>
+                                <option value="nameDesc" class="bg-gray-700">Sortir: Nama (Z-A)</option>
+                                <option value="idAsc" class="bg-gray-700">Sortir: ID (Asc)</option>
+                                <option value="idDesc" class="bg-gray-700">Sortir: ID (Desc)</option>
+                            </select>
+                            
+                            <button id="exportJsonButton" class="px-4 py-1.5 bg-green-600 hover:bg-green-700 font-medium rounded-lg transition duration-200 shadow-md flex items-center justify-center text-sm w-full sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 11.586V3a1 1 0 112 0v8.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                Export Wajah (JSON)
+                            </button>
+                            
+                            <button id="clearAllFacesButton" class="px-4 py-1.5 bg-red-600 hover:bg-red-700 font-medium rounded-lg transition duration-200 shadow-md flex items-center justify-center text-sm w-full sm:w-auto">
+                                🗑️ Hapus Semua
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="faceListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                        </div>
+                    
+                    <p id="noFacesMessage" class="text-center mt-12 p-8 card-bg rounded-xl text-xl text-gray-400 font-semibold shadow-inner hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline mr-2 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Belum ada wajah terdaftar. Silakan registrasi terlebih dahulu.
+                    </p>
+                </section>
+            </div>
+        </main>
+
+    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="card-bg p-6 rounded-xl shadow-2xl w-full max-w-md relative transform transition-all duration-300 scale-100 opacity-100 mx-auto flex flex-col min-h-[50vh] max-h-[90vh] overflow-y-auto" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <button class="close-button absolute top-3 right-4 text-3xl text-gray-400 hover:text-red-400 transition duration-150 leading-none font-light">&times;</button>
+            <h2 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">📝 Edit Data Wajah Pengguna</h2> 
+            <form id="editFaceForm" class="space-y-3 flex-grow"> 
+                <input type="hidden" id="editFaceId">
+                
+                <div class="form-group">
+                    <label for="editFullName" class="block text-sm font-medium text-blue-300">Nama Lengkap:</label>
+                    <input type="text" id="editFullName" required class="mt-1 rounded-lg input-style text-sm text-white border focus:border-purple-500 focus:ring-purple-500 w-full"> 
+                </div>
+                
+                <div class="form-group">
+                    <label for="editIdNumber" class="block text-sm font-medium text-blue-300">ID (NIS/NIP/NIK):</label>
+                    <input type="text" id="editIdNumber" required disabled class="mt-1 rounded-lg input-style text-sm text-gray-500 border border-gray-600 w-full cursor-not-allowed">
+                    <p class="text-xs text-gray-400 mt-1">ID tidak dapat diubah setelah registrasi.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editRole" class="block text-sm font-medium text-blue-300">Role:</label>
+                    <select id="editRole" required class="mt-1 rounded-lg input-style text-sm text-white border focus:border-purple-500 focus:ring-purple-500 w-full cursor-pointer">
+                        <option value="" class="bg-gray-700">Pilih Role</option>
+                        <option value="Siswa" class="bg-gray-700">Siswa</option>
+                        <option value="Guru" class="bg-gray-700">Guru</option>
+                        <option value="Staff" class="bg-gray-700">Staff</option>
+                        <option value="Lainnya" class="bg-gray-700">Lainnya</option>
+                    </select>
+                </div>
+                
+                <div class="form-group flex items-center pt-3 border-t border-gray-700"> 
+                    <input type="checkbox" id="editCustomScheduleToggle" class="mr-3 h-4 w-4 rounded text-purple-600 focus:ring-purple-500 bg-gray-600 border-gray-500 cursor-pointer"> 
+                    <label for="editCustomScheduleToggle" class="text-sm font-medium text-purple-300 cursor-pointer">⚙️ Atur jadwal khusus?</label> 
+                </div>
+                
+                <div id="editCustomScheduleFields" class="space-y-3 hidden border-l-2 border-purple-500 pl-3 py-2 bg-gray-800 rounded-md"> 
+                    <p class="text-xs text-gray-400 font-medium">Isi hanya jika jadwal berbeda dari default sistem.</p> 
+                    <div class="grid grid-cols-2 gap-3"> 
+                        <div class="form-group">
+                            <label for="editArrivalTime" class="block text-xs font-medium text-gray-400">Jam Datang:</label>
+                            <input type="time" id="editArrivalTime" class="mt-1 rounded-lg input-style text-sm text-white border focus:border-purple-500 focus:ring-purple-500 w-full cursor-pointer">
+                        </div>
+                        <div class="form-group">
+                            <label for="editDepartureTime" class="block text-xs font-medium text-gray-400">Jam Pulang:</label>
+                            <input type="time" id="editDepartureTime" class="mt-1 rounded-lg input-style text-sm text-white border focus:border-purple-500 focus:ring-purple-500 w-full cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 font-bold rounded-lg transition duration-200 mt-4 shadow-lg shadow-blue-500/30 text-sm"> Simpan Perubahan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Memastikan tombol Export Sidebar juga berfungsi, meskipun di halaman ini fungsionalitas utama ada di tombol Export JSON di controls.
+        document.addEventListener('DOMContentLoaded', () => {
+             const sidebarExport = document.getElementById('sidebarExportData');
+             if(sidebarExport) {
+                sidebarExport.addEventListener('click', () => {
+                    alert("Proses Export Semua Data Global Dimulai dari Sidebar...");
+                });
+             }
+             
+             // Tambahkan logout functionality
+             const logoutButton = document.getElementById('logoutButton');
+             if (logoutButton) {
+                 logoutButton.addEventListener('click', function() {
+                     // Clear any session data if needed
+                     // For now, we'll just redirect to index.html
+                     window.location.href = '../index.html';
+                 });
+             }
+        });
+    </script>
+    <script src="../script.js"></script>
+    <script src="../sidebar.js"></script>
+    <script>
+        document.getElementById('sidebar-placeholder').innerHTML = generateSidebar('daftar-wajah', '../');
+    </script>
+    <script src="../skrip-daftar-wajah.js"></script>
+</body>
+</html>

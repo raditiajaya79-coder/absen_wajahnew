@@ -1,0 +1,72 @@
+/* General styles for the sidebar */
+.sidebar {
+    width: 16rem; /* Equivalent to w-64 in Tailwind */
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Fixed header for both mobile and desktop */
+.header-bg {
+    position: sticky;
+    top: 0;
+    z-index: 40; /* Ensure header is above main content but below sidebar on mobile */
+    width: 100%; /* Ensure header fills full width */
+}
+
+/* Styles for mobile view */
+@media (max-width: 768px) { /* Equivalent to md breakpoint in Tailwind */
+    .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        height: 100vh; /* Full viewport height */
+        z-index: 50; /* Ensure sidebar is above other content */
+        top: 0;
+        left: 0;
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .sidebar-toggle {
+        display: block; /* Show toggle button on mobile */
+        /* No fixed positioning here, it will be part of the header */
+    }
+    .main-content {
+        margin-left: 0;
+        padding-top: 4rem; /* Adjust for fixed header height */
+        position: relative; /* Ensure z-index works */
+        z-index: 10; /* Lower than sidebar toggle */
+    }
+}
+
+/* Styles for desktop view */
+@media (min-width: 769px) {
+    body {
+        display: flex; /* Enable flexbox for the body on desktop */
+        flex-direction: row; /* Arrange sidebar and main content horizontally */
+    }
+    .flex-wrapper {
+        /* Remove flex properties from here as body now handles it */
+        display: contents; /* Make children participate in parent's flex layout */
+    }
+    .sidebar {
+        transform: translateX(0);
+        position: sticky; /* Change to sticky so it stays in flow but fixed on scroll */
+        top: 0; /* Stick to the top */
+        height: 100vh; /* Full viewport height */
+        z-index: 30; /* Below header */
+        flex-shrink: 0; /* Prevent sidebar from shrinking */
+    }
+    .sidebar-toggle {
+        display: none; /* Hide toggle button on desktop */
+    }
+    .main-content {
+        margin-left: 0; /* Remove margin-left as sidebar is now in flow */
+        flex-grow: 1;
+        overflow-y: auto; /* Only main content scrolls vertically */
+        min-height: 100vh; /* Ensure main content takes full height */
+        width: auto; /* Let flex-grow handle width */
+    }
+    .container-desktop {
+        width: 100%; /* Make content full width */
+        padding: 2rem; /* Add some padding */
+    }
+}

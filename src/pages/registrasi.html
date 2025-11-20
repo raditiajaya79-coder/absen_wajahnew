@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceLite - Registrasi Wajah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../gaya.css">
+    <style>
+        /* Custom styles to enhance the glow/gradient effect */
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #1f2937, #111827); /* Darker gradient */
+        }
+        .active-link {
+            border-image-slice: 1;
+            border-image-source: linear-gradient(to right, #6366f1, #c084fc); /* Blue-Purple Gradient for active */
+            border-left: 4px solid transparent;
+        }
+        .header-bg {
+            background-color: #1f2937; /* Slightly lighter gray for contrast */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .form-bg {
+            background-color: #1f2937;
+            border: 1px solid rgba(75, 85, 99, 0.5); /* Subtle border */
+        }
+        .input-style {
+            background-color: #2c3541 !important;
+            border-color: #4b5563 !important;
+        }
+        /* Style untuk container kamera */
+        .camera-container-glow {
+            border: 2px solid transparent;
+            border-image: linear-gradient(to right, #6366f1, #c084fc) 1;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 30px rgba(192, 132, 252, 0.3);
+            background-color: #1f2937;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-900 min-h-screen text-white relative">
+    <div class="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgZmlsbD0ibm9uZSIgZmlsbC1vcGFjaXR5PSIwLjA0Ij4KICAgIDxwYXRoIGQ9Ik0wIDAgTCA1MCAwIE0gMCA1MCBMIDUwIDUwIiBzdHJva2U9IiM5M2E0ZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8cGF0aCBkPSJNMCAwIEwgNTAgMCBNIDUwIDAgTCA1MCA1MCIgc3Ryb2tlPSIjOTNhNGZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDwvZz4KPC9zdmc+')] z-0"></div>
+    <div class="flex-wrapper relative z-10 flex w-full min-h-screen">
+        <div id="sidebar-placeholder"></div>
+        <main id="main-content" class="main-content p-10 bg-gray-800">
+            <div class="container-desktop">
+                <header class="header-bg p-5 rounded-lg mb-5 shadow-xl flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button id="sidebarToggleButton" class="sidebar-toggle p-2 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none mr-4 md:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <h2 class="text-2xl font-semibold">Registrasi Wajah</h2>
+                    </div>
+                    <button id="logoutButton"
+                        class="text-red-400 hover:text-red-300 text-sm font-medium transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span class="hidden sm:inline">Logout</span>
+                    </button>
+                </header>
+                <section class="registration-form form-bg p-8 rounded-xl shadow-lg">
+                    <form id="faceRegistrationForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-6">
+                                <div class="form-group">
+                                    <label for="fullName" class="block text-sm font-medium text-blue-300">Nama Lengkap:</label>
+                                    <input type="text" id="fullName" required class="mt-1 px-4 py-2 rounded-lg input-style text-white border focus:border-purple-500 focus:ring-purple-500 w-full">
+                                </div>
+                                <div class="form-group">
+                                    <label for="idNumber" class="block text-sm font-medium text-blue-300">ID (NIS/NIP/NIK):</label>
+                                    <input type="text" id="idNumber" required class="mt-1 px-4 py-2 rounded-lg input-style text-white border focus:border-purple-500 focus:ring-purple-500 w-full">
+                                </div>
+                                <div class="form-group">
+                                    <label for="role" class="block text-sm font-medium text-blue-300">Role:</label>
+                                    <select id="role" required class="mt-1 px-4 py-2 rounded-lg input-style text-white border focus:border-purple-500 focus:ring-purple-500 w-full">
+                                        <option value="" class="bg-gray-700">Pilih Role</option>
+                                        <option value="Siswa" class="bg-gray-700">Siswa</option>
+                                        <option value="Guru" class="bg-gray-700">Guru</option>
+                                        <option value="Staff" class="bg-gray-700">Staff</option>
+                                        <option value="Lainnya" class="bg-gray-700">Lainnya</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="scheduleType" class="block text-sm font-medium text-blue-300">Jenis Jadwal:</label>
+                                    <select id="scheduleType" required class="mt-1 px-4 py-2 rounded-lg input-style text-white border focus:border-purple-500 focus:ring-purple-500 w-full">
+                                        <option value="default" class="bg-gray-700">Default (Otomatis)</option>
+                                        <option value="custom" class="bg-gray-700">Atur Khusus</option>
+                                    </select>
+                                </div>
+                                <div id="defaultScheduleFields" class="space-y-4">
+                                    <div class="form-group">
+                                        <label for="defaultArrivalTime" class="block text-sm font-medium text-gray-400">Jam Datang Default:</label>
+                                        <input type="time" id="defaultArrivalTime" value="08:00" required class="mt-1 px-4 py-2 rounded-lg input-style text-white border focus:border-purple-500 focus:ring-purple-500 w-full">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="defaultDepartureTime" class="block text-sm font-medium text-gray-400">Jam Pulang Default:</label>
+                                        <input type="time" id="defaultDepartureTime" value="17:00" required class="mt-1 px-4 py-2 rounded-lg input-style text-white border focus:border-purple-500 focus:ring-purple-500 w-full">
+                                    </div>
+                                </div>
+                                <div id="customScheduleFields" class="space-y-4 hidden">
+                                    <div class="form-group">
+                                        <label for="customArrivalTime" class="block text-sm font-medium text-purple-300">Jam Datang Khusus:</label>
+                                        <input type="time" id="customArrivalTime" class="mt-1 px-4 py-2 rounded-lg input-style text-white border focus:border-purple-500 focus:ring-purple-500 w-full">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="customDepartureTime" class="block text-sm font-medium text-purple-300">Jam Pulang Khusus:</label>
+                                        <input type="time" id="customDepartureTime" class="mt-1 px-4 py-2 rounded-lg input-style text-white border focus:border-purple-500 focus:ring-purple-500 w-full">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="camera-section text-center p-4 rounded-xl camera-container-glow flex flex-col items-center justify-center space-y-4">
+                                <p class="text-sm font-medium text-purple-400 mb-2">Ambil Foto Wajah (Pastikan Cahaya Cukup)</p>
+                                <video id="video" width="480" height="360" autoplay class="border-2 border-transparent rounded-lg object-cover"></video>
+                                <canvas id="canvas" width="480" height="360" class="hidden"></canvas>
+                                <img id="photo" src="" alt="Foto Wajah" class="hidden w-full max-w-[480px] h-90 object-cover border-2 border-transparent rounded-lg">
+                                <button type="button" id="captureButton" class="px-6 py-3 bg-purple-600 hover:bg-purple-700 font-bold rounded-full transition duration-200 shadow-md hover:shadow-purple-500/50">📸 Ambil Foto</button>
+                        </div>
+
+                        <button type="submit" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 font-bold rounded-lg transition duration-200 mt-6 shadow-md hover:shadow-blue-500/50">Daftarkan Wajah</button>
+                    </form>
+                    <p id="message" class="mt-5 text-center font-medium text-green-400"></p>
+                </section>
+            </div>
+        </main>
+        </main>
+    </div>
+    <script>
+       document.addEventListener('DOMContentLoaded', () => {
+           // Tambahkan logout functionality
+           const logoutButton = document.getElementById('logoutButton');
+           if (logoutButton) {
+               logoutButton.addEventListener('click', function() {
+                   // Clear any session data if needed
+                   // For now, we'll just redirect to index.html
+                   window.location.href = '../index.html';
+               });
+           }
+       });
+   </script>
+    <script src="../script.js"></script>
+    <script src="../sidebar.js"></script>
+    <script>
+        document.getElementById('sidebar-placeholder').innerHTML = generateSidebar('registrasi', '../');
+    </script>
+    <script src="../skrip-registrasi.js"></script>
+</body>
+</html>
