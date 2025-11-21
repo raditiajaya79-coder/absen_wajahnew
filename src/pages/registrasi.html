@@ -3,30 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceLite - Registrasi Wajah</title>
+    <title>Registrasi Wajah</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../gaya.css">
     <style>
-        /* Custom styles to enhance the glow/gradient effect */
+        /* Custom styles to match the theme */
         .sidebar-gradient {
             background: linear-gradient(180deg, #1f2937, #111827); /* Darker gradient */
         }
         .active-link {
+            /* Menerapkan efek border aktif di sidebar */
             border-image-slice: 1;
-            border-image-source: linear-gradient(to right, #6366f1, #c084fc); /* Blue-Purple Gradient for active */
+            border-image-source: linear-gradient(to right, #6366f1, #c084fc);
             border-left: 4px solid transparent;
         }
         .header-bg {
             background-color: #1f2937; /* Slightly lighter gray for contrast */
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
-        .form-bg {
+        .card-bg {
             background-color: #1f2937;
-            border: 1px solid rgba(75, 85, 99, 0.5); /* Subtle border */
+            border: 1px solid rgba(75, 85, 99, 0.5);
         }
+        /* Style input yang lebih halus dan LEBIH KECIL */
         .input-style {
             background-color: #2c3541 !important;
             border-color: #4b5563 !important;
+            padding: 0.5rem 1rem; /* Padding Diperkecil menjadi 0.5rem */
+        }
+        /* Style untuk efek fokus yang lebih menonjol */
+        .input-style:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Ring fokus biru muda */
         }
         /* Style untuk container kamera */
         .camera-container-glow {
@@ -39,10 +46,9 @@
     </style>
 </head>
 <body class="font-sans bg-gray-900 min-h-screen text-white relative">
-    <div class="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgZmlsbD0ibm9uZSIgZmlsbC1vcGFjaXR5PSIwLjA0Ij4KICAgIDxwYXRoIGQ9Ik0wIDAgTCA1MCAwIE0gMCA1MCBMIDUwIDUwIiBzdHJva2U9IiM5M2E0ZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8cGF0aCBkPSJNMCAwIEwgNTAgMCBNIDUwIDAgTCA1MCA1MCIgc3Ryb2tlPSIjOTNhNGZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDwvZz4KPC9zdmc+')] z-0"></div>
     <div class="flex-wrapper relative z-10 flex w-full min-h-screen">
         <div id="sidebar-placeholder"></div>
-        <main id="main-content" class="main-content p-10 bg-gray-800">
+        <main id="main-content" class="main-content p-10">
             <div class="container-desktop">
                 <header class="header-bg p-5 rounded-lg mb-5 shadow-xl flex items-center justify-between">
                     <div class="flex items-center">
@@ -63,7 +69,7 @@
                         <span class="hidden sm:inline">Logout</span>
                     </button>
                 </header>
-                <section class="registration-form form-bg p-8 rounded-xl shadow-lg">
+                <section class="registration-form card-bg p-8 rounded-xl shadow-lg">
                     <form id="faceRegistrationForm" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-6">
@@ -138,7 +144,7 @@
                logoutButton.addEventListener('click', function() {
                    // Clear any session data if needed
                    // For now, we'll just redirect to index.html
-                   window.location.href = '/index.html';
+                   window.location.href = '../../absen_wajahnew.html';
                });
            }
        });

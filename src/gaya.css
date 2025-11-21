@@ -70,3 +70,11 @@
         padding: 2rem; /* Add some padding */
     }
 }
+/* Styles for the modal close button */
+.close-button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+}

@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearAllFacesButton = document.getElementById("clearAllFacesButton");
 
   const editModal = document.getElementById("editModal");
-  const closeButton = editModal.querySelector(".close-button");
+  const editModalCloseButton = editModal.querySelector(".close-button");
   const editFaceForm = document.getElementById("editFaceForm");
   const editFaceIdInput = document.getElementById("editFaceId");
   const editFullNameInput = document.getElementById("editFullName");
@@ -22,8 +22,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const editArrivalTimeInput = document.getElementById("editArrivalTime");
   const editDepartureTimeInput = document.getElementById("editDepartureTime");
 
+  const deleteConfirmModal = document.getElementById("deleteConfirmModal");
+  const deleteConfirmModalCloseButton = deleteConfirmModal.querySelector(".close-button");
+  const deleteFaceNameSpan = document.getElementById("deleteFaceName");
+  const deleteFaceIdSpan = document.getElementById("deleteFaceId");
+  const cancelDeleteButton = document.getElementById("cancelDeleteButton");
+  const confirmDeleteButton = document.getElementById("confirmDeleteButton");
+
+  let faceToDeleteId = null;
+
   let registeredFaces =
     JSON.parse(localStorage.getItem("registeredFaces")) || [];
+
+  const deleteAllConfirmModal = document.getElementById("deleteAllConfirmModal");
+  const deleteAllConfirmModalCloseButton = deleteAllConfirmModal.querySelector(".close-button");
+  const cancelDeleteAllButton = document.getElementById("cancelDeleteAllButton");
+  const confirmDeleteAllButton = document.getElementById("confirmDeleteAllButton");
 
   function renderFaces(facesToRender) {
     faceListContainer.innerHTML = ""; // Bersihkan container
@@ -107,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     document.querySelectorAll(".delete-button").forEach((button) => {
       button.addEventListener("click", (event) =>
-        deleteFace(event.target.dataset.id)
+        openDeleteConfirmModal(event.target.dataset.id)
       );
     });
   }
@@ -161,13 +175,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  closeButton.addEventListener("click", () => {
+  editModalCloseButton.addEventListener("click", () => {
     editModal.style.display = "none";
   });
 
   window.addEventListener("click", (event) => {
     if (event.target === editModal) {
       editModal.style.display = "none";
+    }
+    if (event.target === deleteConfirmModal) {
+      deleteConfirmModal.style.display = "none";
+    }
+    if (event.target === deleteAllConfirmModal) {
+      deleteAllConfirmModal.style.display = "none";
     }
   });
 
@@ -210,14 +230,36 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Data wajah berhasil diperbarui!");
   });
 
-  function deleteFace(id) {
-    if (confirm("Apakah Anda yakin ingin menghapus wajah ini?")) {
-      registeredFaces = registeredFaces.filter((face) => face.id !== id);
-      localStorage.setItem("registeredFaces", JSON.stringify(registeredFaces));
-      filterAndSortFaces(); // Render ulang setelah penghapusan
-      alert("Wajah berhasil dihapus!");
+  function openDeleteConfirmModal(id) {
+    const faceToDelete = registeredFaces.find((face) => face.id === id);
+    if (faceToDelete) {
+      faceToDeleteId = id;
+      deleteFaceNameSpan.textContent = faceToDelete.fullName;
+      deleteFaceIdSpan.textContent = faceToDelete.idNumber;
+      deleteConfirmModal.style.display = "block";
     }
   }
+
+  deleteConfirmModalCloseButton.addEventListener("click", () => {
+    deleteConfirmModal.style.display = "none";
+    faceToDeleteId = null;
+  });
+
+  cancelDeleteButton.addEventListener("click", () => {
+    deleteConfirmModal.style.display = "none";
+    faceToDeleteId = null;
+  });
+
+  confirmDeleteButton.addEventListener("click", () => {
+    if (faceToDeleteId) {
+      registeredFaces = registeredFaces.filter((face) => face.id !== faceToDeleteId);
+      localStorage.setItem("registeredFaces", JSON.stringify(registeredFaces));
+      filterAndSortFaces();
+      alert("Wajah berhasil dihapus!");
+      deleteConfirmModal.style.display = "none";
+      faceToDeleteId = null;
+    }
+  });
 
   exportJsonButton.addEventListener("click", () => {
     const dataStr = JSON.stringify(registeredFaces, null, 2);
@@ -236,16 +278,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   clearAllFacesButton.addEventListener("click", () => {
-    if (
-      confirm(
-        "Apakah Anda yakin ingin menghapus SEMUA wajah terdaftar? Aksi ini tidak dapat dibatalkan."
-      )
-    ) {
-      registeredFaces = [];
-      localStorage.setItem("registeredFaces", JSON.stringify(registeredFaces));
-      filterAndSortFaces();
-      alert("Semua wajah terdaftar berhasil dihapus!");
-    }
+    deleteAllConfirmModal.style.display = "block";
+  });
+
+  deleteAllConfirmModalCloseButton.addEventListener("click", () => {
+    deleteAllConfirmModal.style.display = "none";
+  });
+
+  cancelDeleteAllButton.addEventListener("click", () => {
+    deleteAllConfirmModal.style.display = "none";
+  });
+
+  confirmDeleteAllButton.addEventListener("click", () => {
+    registeredFaces = [];
+    localStorage.setItem("registeredFaces", JSON.stringify(registeredFaces));
+    filterAndSortFaces();
+    alert("Semua wajah terdaftar berhasil dihapus!");
+    deleteAllConfirmModal.style.display = "none";
   });
 
   searchInput.addEventListener("input", filterAndSortFaces);

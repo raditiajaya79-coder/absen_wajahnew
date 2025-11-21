@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceLite - Dashboard Admin</title>
+    <title>Dashboard Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="gaya.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -65,12 +65,9 @@
 </head>
 
 <body class="font-sans bg-gray-900 min-h-screen text-white relative">
-    <div
-        class="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgZmlsbD0ibm9uZSIgZmlsbC1vcGFjaXR5PSIwLjA0Ij4KICAgIDxwYXRoIGQ9Ik0wIDAgTCA1MCAwIE0gMCA1MCBMIDUwIDUwIiBzdHJva2U9IiM5M2E0ZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8cGF0aCBkPSJNMCAwIEwgNTAgMCBNIDUwIDAgTCA1MCA1MCIgc3Ryb2tlPSIjOTNhNGZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDwvZ2c+Cjwvc3ZnPg==')] z-0">
-    </div>
     <div class="flex-wrapper relative z-10 w-full min-h-screen">
         <div id="sidebar-placeholder"></div>
-        <main id="main-content" class="main-content p-10 bg-gray-800">
+        <main id="main-content" class="main-content p-10">
             <div class="container-desktop">
                 <header class="header-bg p-4 rounded-lg mb-5 shadow-xl flex items-center justify-between">
                     <div class="flex items-center">
@@ -533,7 +530,7 @@
                 logoutButton.addEventListener('click', function() {
                     // Clear any session data if needed
                     // For now, we'll just redirect to index.html
-                    window.location.href = '/index.html';
+                    window.location.href = '../absen_wajahnew.html';
                 });
             }
         });

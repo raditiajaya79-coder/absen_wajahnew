@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceLite - Daftar Wajah Terdaftar</title>
+    <title>Daftar Wajah Terdaftar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../gaya.css">
     <style>
@@ -40,32 +40,12 @@
             display: none;
         }
 
-    /* Tambahkan di <style> section */
-.main-content {
-    background: linear-gradient(135deg, #1a1d29 0%, #2d1b3d 100%);
-    position: relative;
-}
-
-.main-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
-    background-size: 50px 50px;
-    pointer-events: none;
-}
     </style>
 </head>
 <body class="font-sans bg-gray-900 min-h-screen text-white relative">
-    <div class="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgZmlsbD0ibm9uZSIgZmlsbC1vcGFjaXR5PSIwLjA0Ij4KICAgIDxwYXRoIGQ9Ik0wIDAgTCA1MCAwIE0gMCA1MCBMIDUwIDUwIiBzdHJva2U9IiM5M2E0ZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8cGF0aCBkPSJNMCAwIEwgNTAgMCBNIDUwIDAgTCA1MCA1MCIgc3Ryb2tlPSIjOTNhNGZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDwvZz4KPC9zdmc+')] z-0"></div>
     <div class="flex-wrapper relative z-10 w-full min-h-screen">
         <div id="sidebar-placeholder"></div>
-        <main id="main-content" class="main-content p-10 bg-gray-800">
+        <main id="main-content" class="main-content p-10">
             <div class="container-desktop">
                 <header class="header-bg p-4 rounded-lg mb-4 shadow-xl flex items-center justify-between">
                     <div class="flex items-center">
@@ -175,6 +155,28 @@
             </form>
         </div>
     </div>
+    <div id="deleteAllConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="card-bg p-6 rounded-xl shadow-2xl w-full max-w-sm relative transform transition-all duration-300 scale-100 opacity-100 mx-auto">
+            <button class="close-button absolute top-3 right-4 text-3xl text-gray-400 hover:text-red-400 transition duration-150 leading-none font-light">&times;</button>
+            <h2 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2 text-red-400">Konfirmasi Hapus Semua Wajah</h2>
+            <p class="text-gray-300 mb-6">Anda yakin ingin menghapus <span class="font-semibold text-white">SEMUA</span> wajah terdaftar? Tindakan ini <span class="font-bold text-red-300">TIDAK DAPAT DIBATALKAN</span>.</p>
+            <div class="flex justify-end gap-3">
+                <button id="cancelDeleteAllButton" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition duration-200">Batal</button>
+                <button id="confirmDeleteAllButton" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-medium transition duration-200">Hapus Semua</button>
+            </div>
+        </div>
+    </div>
+    <div id="deleteConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="card-bg p-6 rounded-xl shadow-2xl w-full max-w-sm relative transform transition-all duration-300 scale-100 opacity-100 mx-auto">
+            <button class="close-button absolute top-3 right-4 text-3xl text-gray-400 hover:text-red-400 transition duration-150 leading-none font-light">&times;</button>
+            <h2 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2 text-red-400">Konfirmasi Penghapusan</h2>
+            <p class="text-gray-300 mb-6">Anda yakin ingin menghapus wajah <span id="deleteFaceName" class="font-semibold text-white"></span> (ID: <span id="deleteFaceId" class="font-semibold text-white"></span>)? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-end gap-3">
+                <button id="cancelDeleteButton" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition duration-200">Batal</button>
+                <button id="confirmDeleteButton" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-medium transition duration-200">Hapus</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Memastikan tombol Export Sidebar juga berfungsi, meskipun di halaman ini fungsionalitas utama ada di tombol Export JSON di controls.
@@ -192,7 +194,7 @@
                  logoutButton.addEventListener('click', function() {
                      // Clear any session data if needed
                      // For now, we'll just redirect to index.html
-                     window.location.href = '/index.html';
+                     window.location.href = '../../absen_wajahnew.html';
                  });
              }
         });
