@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="gaya.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom styles to enhance the glow/gradient effect */
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #1f2937, #111827);
+        }
+
+        .active-link {
+            border-image-slice: 1;
+            border-image-source: linear-gradient(to right, #6366f1, #c084fc);
+            border-left: 4px solid transparent;
+        }
+
+        .header-bg {
+            background-color: #1f2937;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-bg {
+            background-color: #1f2937;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+        }
+
+        /* --- CSS KUSTOM PERBAIKAN LIST & SCROLLBAR --- */
+
+        /* 1. Tampilan terbatas (default: 2 item, no scroll) */
+        .list-limited {
+            max-height: 4rem;
+            /* Tinggi yang disesuaikan untuk 2 item text-sm */
+            overflow: hidden;
+            padding: 0.25rem 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* 2. Tampilan penuh (dengan scroll, tinggi tetap 2 item, SCROLLBAR TERSEMBUNYI) */
+        .list-full-scroll {
+            max-height: 4rem;
+            /* TINGGI TETAP SAMA DENGAN LIMITED */
+            overflow-y: scroll;
+            /* Mengaktifkan fungsionalitas scroll */
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Menyembunyikan Scrollbar untuk WebKit browsers (Chrome, Safari, Edge) */
+        .list-full-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Menyembunyikan Scrollbar untuk IE dan Edge */
+        .list-full-scroll {
+            -ms-overflow-style: none;
+        }
+
+        /* Menyembunyikan Scrollbar untuk Firefox */
+        .list-full-scroll {
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-gray-900 min-h-screen text-white relative">
+    <div class="flex-wrapper relative z-10 w-full min-h-screen">
+        <div id="sidebar-placeholder"></div>
+        <main id="main-content" class="main-content p-4 md:p-10">
+            <div class="container-desktop">
+                <header class="header-bg p-4 rounded-lg mb-5 shadow-xl flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button id="sidebarToggleButton"
+                            class="p-2 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none mr-4 lg:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <h2 class="text-2xl font-semibold">Dashboard Admin</h2>
+                    </div>
+                    <button id="logoutButton"
+                        class="text-red-400 hover:text-red-300 text-sm font-medium transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span class="hidden sm:inline">Logout</span>
+                    </button>
+                </header>
+
+                <div class="flex border-b-2 border-gray-700 mb-5">
+                    <button
+                        class="tab-button px-4 py-3 text-sm font-bold text-white border-b-4 border-purple-500 focus:outline-none transition duration-150"
+                        data-tab="ringkasan">📊 Ringkasan</button>
+                    <button
+                        class="tab-button px-4 py-3 text-sm font-medium text-gray-400 hover:text-purple-400 focus:outline-none transition duration-150"
+                        data-tab="absensi-detail">Absensi Detail</button>
+                    <button
+                        class="tab-button px-4 py-3 text-sm font-medium text-gray-400 hover:text-purple-400 focus:outline-none transition duration-150"
+                        data-tab="pengaturan">Pengaturan</button>
+                </div>
+
+                <div id="tab-content">
+                    <section id="ringkasan" class="tab-section">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+
+                            <div
+                                class="card-bg p-4 rounded-xl shadow-2xl border-l-4 border-blue-500 flex flex-col justify-center">
+                                <p class="text-sm text-blue-400 font-medium">📅 Hari dan Tanggal</p>
+                                <p id="currentDateCompact" class="text-xl font-extrabold text-white mt-1">Kamis, 20
+                                    November
+                                    2025</p>
+                                <p class="text-xs text-gray-400 mt-1">Status Absensi Hari Ini</p>
+                            </div>
+
+                            <div
+                                class="card-bg p-4 rounded-xl shadow-2xl border-l-4 border-green-500 hover:shadow-green-500/50 transition duration-300">
+                                <p class="text-sm text-green-400 font-medium">✅ Sudah Absen</p>
+                                <p id="attendedToday" class="text-2xl font-extrabold text-white mt-1">0</p>
+                                <p class="text-xs text-gray-400 mt-1">Dari <span
+                                        id="totalRegisteredFacesOverview">0</span>
+                                    total</p>
+                            </div>
+
+                            <div
+                                class="card-bg p-4 rounded-xl shadow-2xl border-l-4 border-orange-500 hover:shadow-orange-500/50 transition duration-300">
+                                <p class="text-sm text-orange-400 font-medium">⚠️ Terlambat</p>
+                                <p id="lateToday" class="text-2xl font-extrabold text-white mt-1">0</p>
+                                <p class="text-xs text-gray-400 mt-1">Pengguna terlambat</p>
+                            </div>
+
+                            <div
+                                class="card-bg p-4 rounded-xl shadow-2xl border-l-4 border-red-500 hover:shadow-red-500/50 transition duration-300">
+                                <p class="text-sm text-red-400 font-medium">❌ Belum Absen</p>
+                                <p id="notAttendedToday" class="text-2xl font-extrabold text-white mt-1">0</p>
+                                <p class="text-xs text-gray-400 mt-1">Perlu ditindaklanjuti</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <p class="text-xs text-gray-400 italic">Data diperbarui secara real-time</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+
+                            <div class="card-bg p-4 rounded-xl shadow-xl lg:col-span-1">
+                                <h3 class="text-lg font-bold text-purple-300 mb-2 border-b border-gray-600 pb-1">Rasio
+                                    Kehadiran</h3>
+                                <div class="h-64 flex items-center justify-center"> <canvas
+                                        id="attendanceChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="card-bg p-4 rounded-xl shadow-xl lg:col-span-2">
+                                <h3 class="text-lg font-bold text-blue-300 mb-2 border-b border-gray-600 pb-1">
+                                    Distribusi
+                                    Pengguna</h3>
+                                <div class="h-64"> <canvas id="roleChart"></canvas>
+                                </div>
+                                <p class="text-xs text-gray-400 text-center pt-2">Total Wajah Terdaftar: <span
+                                        id="totalRegisteredFacesFooter" class="font-bold text-purple-300">12</span></p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="card-bg p-5 rounded-xl shadow-lg border-l-4 border-green-500">
+                                <h3 class="text-lg font-medium text-green-400 mb-3">✅ Detail Sudah Absen</h3>
+                                <div id="attendedListContainer" class="list-limited transition-all duration-300">
+                                    <ul id="attendedList" class="space-y-2 text-sm text-gray-200">
+                                    </ul>
+                                </div>
+                                <button id="showAllAttended"
+                                    class="mt-2 text-blue-400 hover:text-blue-300 text-sm hidden">Lihat Semua</button>
+                                <button id="closeAttended"
+                                    class="mt-2 text-red-400 hover:text-red-300 text-sm hidden">Tutup</button>
+                            </div>
+                            <div class="card-bg p-5 rounded-xl shadow-lg border-l-4 border-red-500">
+                                <h3 class="text-lg font-medium text-red-400 mb-3">❌ Detail Belum Absen</h3>
+                                <div id="notAttendedListContainer" class="list-limited transition-all duration-300">
+                                    <ul id="notAttendedList" class="space-y-2 text-sm text-gray-200">
+                                    </ul>
+                                </div>
+                                <button id="showAllNotAttended"
+                                    class="mt-2 text-blue-400 hover:text-blue-300 text-sm hidden">Lihat Semua</button>
+                                <button id="closeNotAttended"
+                                    class="mt-2 text-red-400 hover:text-red-300 text-sm hidden">Tutup</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="absensi-detail" class="tab-section hidden">
+                        <div class="card-bg p-6 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-semibold text-white mb-4">Detail Absensi</h3>
+                            <p class="text-gray-400">Konten untuk detail absensi akan ditambahkan di sini.</p>
+                        </div>
+                    </section>
+
+                    <section id="pengaturan" class="tab-section hidden">
+                        <div class="card-bg p-6 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-semibold text-white mb-4">Pengaturan Dashboard</h3>
+                            <p class="text-gray-400">Konten untuk pengaturan akan ditambahkan di sini.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            // Tab Switching Logic
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabSections = document.querySelectorAll('.tab-section');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('border-purple-500', 'text-white', 'font-bold');
+                        btn.classList.add('text-gray-400', 'font-medium');
+                    });
+                    button.classList.add('border-purple-500', 'text-white', 'font-bold');
+                    button.classList.remove('text-gray-400', 'font-medium');
+
+                    tabSections.forEach(section => {
+                        if (section.id === targetTab) {
+                            section.classList.remove('hidden');
+                        } else {
+                            section.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // =================================================================
+            // FUNGSI UNTUK MENGELOLA LIST ABSENSI (Lihat Semua & Tutup)
+            // =================================================================
+
+            // Helper function to populate the list (either limited or all)
+            const maxDisplayedItems = 2; // Batas item yang ditampilkan saat mode terbatas
+            function populateList(listId, items, attendanceRecords, isLimited) {
+                const listElement = document.getElementById(listId);
+                listElement.innerHTML = ''; // Clear existing list items
+
+                // JIKA isLimited TRUE, HANYA TAMPILKAN 2 DATA PERTAMA
+                // JIKA isLimited FALSE, TAMPILKAN SEMUA DATA (untuk scrolling)
+                const itemsToDisplay = isLimited ? items.slice(0, maxDisplayedItems) : items;
+
+                // Iterasi dimulai dari 0, tetapi penomoran dimulai dari 1
+                itemsToDisplay.forEach((face, index) => {
+                    const listItem = document.createElement('li');
+                    let textContent;
+
+                    if (listId === 'attendedList' && attendanceRecords) {
+                        // Logika untuk list yang Sudah Absen
+                        const record = attendanceRecords.find(r => r.idNumber === face.idNumber);
+                        if (record) {
+                            const status = record.status === 'Hadir' ? 'Tepat Waktu' : 'Terlambat';
+                            // Format: 1. Nama - Waktu - Status
+                            textContent = `${index + 1}. ${face.fullName} — ${record.time} — ${status}`;
+                        }
+                    } else {
+                        // Logika untuk list yang Belum Absen
+                        // Format: 1. Nama
+                        textContent = `${index + 1}. ${face.fullName}`;
+                    }
+
+                    listItem.textContent = textContent;
+                    listElement.appendChild(listItem);
+                });
+            }
+
+            // Function to show all items (activate scroll)
+            function showAllItems(allItems, attendanceRecords, listId, containerId, showAllButtonId, closeButtonId) {
+                const containerElement = document.getElementById(containerId);
+                const showAllButton = document.getElementById(showAllButtonId);
+                const closeButton = document.getElementById(closeButtonId);
+
+                // 1. Populate list with ALL items (no limit)
+                // KITA MEMPOPULASI SEMUA DATA AGAR BISA DISCROLL
+                populateList(listId, allItems, attendanceRecords, false);
+
+                // 2. Activate scrolling by changing container class
+                // Hapus kelas terbatas, tambahkan kelas scroll (TINGGI TETAP 4rem)
+                containerElement.classList.remove('list-limited');
+                containerElement.classList.add('list-full-scroll');
+
+                // 3. Hide "View All" button and show the "Tutup" button
+                showAllButton.classList.add('hidden');
+                closeButton.classList.remove('hidden');
+
+                // Set up close button functionality
+                closeButton.onclick = () => {
+                    revertToListView(allItems, attendanceRecords, listId, containerId, showAllButtonId, closeButtonId);
+                };
+            }
+
+            // Function to revert back to limited list view (deactivate scroll)
+            function revertToListView(allItems, attendanceRecords, listId, containerId, showAllButtonId, closeButtonId) {
+                const containerElement = document.getElementById(containerId);
+                const showAllButton = document.getElementById(showAllButtonId);
+                const closeButton = document.getElementById(closeButtonId);
+
+                // 1. Deactivate scrolling by reverting container class
+                // Hapus kelas scroll, tambahkan kelas terbatas
+                containerElement.classList.remove('list-full-scroll');
+                containerElement.classList.add('list-limited');
+
+                // 2. Populate list with LIMITED items (only 2 teratas)
+                // KITA HANYA MEMPOPULASI 2 DATA PERTAMA
+                populateList(listId, allItems, attendanceRecords, true);
+
+                // 3. Show "View All" button if necessary and hide "Tutup"
+                if (allItems.length > maxDisplayedItems) {
+                    showAllButton.classList.remove('hidden');
+                }
+                closeButton.classList.add('hidden');
+            }
+
+
+            // Function to update dashboard with real-time data
+            function updateDashboardData() {
+                const registeredFaces = JSON.parse(localStorage.getItem('registeredFaces')) || [];
+                const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+
+                const today = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const dateCompactText = today.toLocaleDateString('id-ID', options);
+                document.getElementById('currentDateCompact').textContent = dateCompactText;
+
+                const todayISO = today.toISOString().slice(0, 10);
+                const todayAttendanceRecords = attendanceRecords.filter(record => record.date === todayISO);
+
+                // Calculate attendance statistics
+                const attendedCount = todayAttendanceRecords.filter(r => r.status === 'Hadir').length;
+                const lateCount = todayAttendanceRecords.filter(r => r.status === 'Terlambat').length;
+                const notAttendedCount = registeredFaces.length - todayAttendanceRecords.length;
+
+                // Update all dashboard elements
+                document.getElementById('totalRegisteredFacesOverview').textContent = registeredFaces.length ?? 0;
+                document.getElementById('attendedToday').textContent = attendedCount ?? 0;
+                document.getElementById('lateToday').textContent = lateCount ?? 0;
+                document.getElementById('notAttendedToday').textContent = notAttendedCount ?? 0;
+                document.getElementById('totalRegisteredFacesFooter').textContent = registeredFaces.length ?? 0;
+
+                // Update lists and buttons
+                const showAllAttendedBtn = document.getElementById('showAllAttended');
+                const showAllNotAttendedBtn = document.getElementById('showAllNotAttended');
+                const closeAttendedBtn = document.getElementById('closeAttended');
+                const closeNotAttendedBtn = document.getElementById('closeNotAttended');
+
+                // Reset button visibility for limited view
+                showAllAttendedBtn.classList.add('hidden');
+                showAllNotAttendedBtn.classList.add('hidden');
+                closeAttendedBtn.classList.add('hidden');
+                closeNotAttendedBtn.classList.add('hidden');
+
+                // Reset list container class to limited height (in case it was left open)
+                document.getElementById('attendedListContainer').classList.remove('list-full-scroll');
+                document.getElementById('attendedListContainer').classList.add('list-limited');
+                document.getElementById('notAttendedListContainer').classList.remove('list-full-scroll');
+                document.getElementById('notAttendedListContainer').classList.add('list-limited');
+
+                // -------------------------------------------------------------
+                // Logika Pengisian dan Tombol untuk Sudah Absen
+                // -------------------------------------------------------------
+                const attendedTodayFaces = registeredFaces.filter(face =>
+                    todayAttendanceRecords.some(record => record.idNumber === face.idNumber)
+                );
+
+                // Tampilkan list dalam mode terbatas (default)
+                populateList('attendedList', attendedTodayFaces, todayAttendanceRecords, true);
+
+                const attendedRemaining = attendedTodayFaces.length - maxDisplayedItems;
+                if (attendedRemaining > 0) {
+                    showAllAttendedBtn.classList.remove('hidden');
+                    // Set up "Lihat Semua" functionality
+                    showAllAttendedBtn.onclick = () => {
+                        showAllItems(attendedTodayFaces, todayAttendanceRecords, 'attendedList', 'attendedListContainer', 'showAllAttended', 'closeAttended');
+                    };
+                }
+
+                // -------------------------------------------------------------
+                // Logika Pengisian dan Tombol untuk Belum Absen
+                // -------------------------------------------------------------
+                const notAttendedFaces = registeredFaces.filter(face =>
+                    !todayAttendanceRecords.some(record => record.idNumber === face.idNumber)
+                );
+
+                // Tampilkan list dalam mode terbatas (default)
+                populateList('notAttendedList', notAttendedFaces, null, true);
+
+                const notAttendedRemaining = notAttendedFaces.length - maxDisplayedItems;
+                if (notAttendedRemaining > 0) {
+                    showAllNotAttendedBtn.classList.remove('hidden');
+                    // Set up "Lihat Semua" functionality
+                    showAllNotAttendedBtn.onclick = () => {
+                        showAllItems(notAttendedFaces, null, 'notAttendedList', 'notAttendedListContainer', 'showAllNotAttended', 'closeNotAttended');
+                    };
+                }
+            }
+
+            // Initialize charts and dashboard data
+            document.addEventListener('DOMContentLoaded', function () {
+                // Initial chart update and dashboard data
+                updateDashboardData();
+
+                // Initialize Charts
+                // 1. Attendance Donut Chart
+                const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+                const attendanceChart = new Chart(attendanceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Tepat Waktu', 'Terlambat', 'Belum Absen'],
+                        datasets: [{
+                            // Warna Disesuaikan
+                            data: [0, 0, 0],
+                            backgroundColor: ['#4ade80', '#fb923c', '#f87171'],
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#d1d5db',
+                                    boxWidth: 10
+                                }
+                            },
+                            title: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                // 2. Role Bar Chart
+                const roleCtx = document.getElementById('roleChart').getContext('2d');
+                const roleChart = new Chart(roleCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Siswa', 'Guru', 'Staff', 'Lainnya'],
+                        datasets: [{
+                            label: 'Total Wajah',
+                            // Warna Disesuaikan
+                            data: [0, 0, 0, 0],
+                            backgroundColor: ['#60a5fa', '#a78bfa', '#34d399', '#fcd34d'],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    color: '#d1d5db', // Teks Y-axis putih
+                                    precision: 0
+                                },
+                                grid: {
+                                    color: 'rgba(75, 85, 99, 0.4)' // Garis grid horizontal abu-abu gelap
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#d1d5db' // Teks X-axis putih
+                                },
+                                grid: {
+                                    display: false // Menghilangkan garis grid vertikal
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Function to update charts with real-time data
+                function updateCharts() {
+                    const registeredFaces = JSON.parse(localStorage.getItem('registeredFaces')) || [];
+                    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+
+                    const today = new Date();
+                    const todayISO = today.toISOString().slice(0, 10);
+                    const todayAttendanceRecords = attendanceRecords.filter(record => record.date === todayISO);
+
+                    // Calculate attendance statistics
+                    const attendedCount = todayAttendanceRecords.filter(r => r.status === 'Hadir').length;
+                    const lateCount = todayAttendanceRecords.filter(r => r.status === 'Terlambat').length;
+                    const notAttendedCount = registeredFaces.length - todayAttendanceRecords.length;
+
+                    // Update attendance chart
+                    attendanceChart.data.datasets[0].data = [attendedCount ?? 0, lateCount ?? 0, notAttendedCount ?? 0];
+                    attendanceChart.update();
+
+                    // Update role chart
+                    const roleCounts = {
+                        siswa: registeredFaces.filter(f => f.role === 'Siswa').length ?? 0,
+                        guru: registeredFaces.filter(f => f.role === 'Guru').length ?? 0,
+                        staff: registeredFaces.filter(f => f.role === 'Staff').length ?? 0,
+                        lainnya: registeredFaces.filter(f => f.role !== 'Siswa' && f.role !== 'Guru' && f.role !== 'Staff').length ?? 0
+                    };
+                    roleChart.data.datasets[0].data = [
+                        roleCounts.siswa,
+                        roleCounts.guru,
+                        roleCounts.staff,
+                        roleCounts.lainnya
+                    ];
+                    roleChart.update();
+                }
+
+                // Initial chart update and dashboard data
+                updateCharts();
+
+                // Set up interval to update charts and dashboard data every 5 seconds
+                setInterval(() => {
+                    updateCharts();
+                    updateDashboardData();
+                }, 5000);
+            });
+        </script>
+        <script>
+            // Add logout functionality
+            document.addEventListener('DOMContentLoaded', function () {
+                const logoutButton = document.getElementById('logoutButton');
+                if (logoutButton) {
+                    logoutButton.addEventListener('click', function () {
+                        // Clear any session data if needed
+                        // For now, we'll just redirect to index.html
+                        window.location.href = '../index.html';
+                    });
+                }
+            });
+        </script>
+        <script src="script.js"></script>
+        <script src="sidebar.js"></script>
+        <script>
+            document.getElementById('sidebar-placeholder').innerHTML = generateSidebar('dashboard', './');
+        </script>
+</body>
+
+</html>
