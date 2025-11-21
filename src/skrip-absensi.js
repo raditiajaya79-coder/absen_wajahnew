@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const context = canvas.getContext("2d");
 
   // === Konfigurasi ===
-  const SIMILARITY_THRESHOLD = 75;
+  const SIMILARITY_THRESHOLD = 70;
   const SCAN_INTERVAL = 1000;
 
   // === Data LocalStorage ===
