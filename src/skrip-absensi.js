@@ -52,11 +52,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Fungsi untuk mereset tampilan informasi absensi (PENTING: Semua menjadi '-')
   function resetDetectedInfo() {
-    detectedName.textContent = "0";
-    detectedId.textContent = "0";
-    detectedTime.textContent = "0";
-    if (detectedDate) detectedDate.textContent = "0";
-    if (detectedKeterangan) detectedKeterangan.textContent = "0";
+    detectedName.textContent = "-";
+    detectedId.textContent = "-";
+    detectedTime.textContent = "-";
+    if (detectedDate) detectedDate.textContent = "-";
+    if (detectedKeterangan) detectedKeterangan.textContent = "-";
   }
 
   // Fungsi logik perhitungan status absensi (Tidak diubah)
