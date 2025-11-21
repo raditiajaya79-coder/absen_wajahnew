@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const editDepartureTimeInput = document.getElementById("editDepartureTime");
 
   const deleteConfirmModal = document.getElementById("deleteConfirmModal");
-  const deleteConfirmModalCloseButton = deleteConfirmModal.querySelector(".close-button");
+  const deleteConfirmModalCloseButton =
+    deleteConfirmModal.querySelector(".close-button");
   const deleteFaceNameSpan = document.getElementById("deleteFaceName");
   const deleteFaceIdSpan = document.getElementById("deleteFaceId");
   const cancelDeleteButton = document.getElementById("cancelDeleteButton");
@@ -34,10 +35,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let registeredFaces =
     JSON.parse(localStorage.getItem("registeredFaces")) || [];
 
-  const deleteAllConfirmModal = document.getElementById("deleteAllConfirmModal");
-  const deleteAllConfirmModalCloseButton = deleteAllConfirmModal.querySelector(".close-button");
-  const cancelDeleteAllButton = document.getElementById("cancelDeleteAllButton");
-  const confirmDeleteAllButton = document.getElementById("confirmDeleteAllButton");
+  const deleteAllConfirmModal = document.getElementById(
+    "deleteAllConfirmModal"
+  );
+  const deleteAllConfirmModalCloseButton =
+    deleteAllConfirmModal.querySelector(".close-button");
+  const cancelDeleteAllButton = document.getElementById(
+    "cancelDeleteAllButton"
+  );
+  const confirmDeleteAllButton = document.getElementById(
+    "confirmDeleteAllButton"
+  );
 
   function renderFaces(facesToRender) {
     faceListContainer.innerHTML = ""; // Bersihkan container
@@ -252,7 +260,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   confirmDeleteButton.addEventListener("click", () => {
     if (faceToDeleteId) {
-      registeredFaces = registeredFaces.filter((face) => face.id !== faceToDeleteId);
+      registeredFaces = registeredFaces.filter(
+        (face) => face.id !== faceToDeleteId
+      );
       localStorage.setItem("registeredFaces", JSON.stringify(registeredFaces));
       filterAndSortFaces();
       alert("Wajah berhasil dihapus!");

@@ -46,10 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sidebar toggle functionality for mobile
     document.body.addEventListener('click', (event) => {
-        if (event.target && event.target.id === 'sidebarToggleButton' || event.target.closest('#sidebarToggleButton')) {
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar) {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggleButton = document.getElementById('sidebarToggleButton');
+
+        if (sidebar && sidebarToggleButton) {
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnToggleButton = sidebarToggleButton.contains(event.target);
+
+            if (isClickOnToggleButton) {
                 sidebar.classList.toggle('open');
+            } else if (!isClickInsideSidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
             }
         }
     });
