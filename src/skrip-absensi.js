@@ -52,11 +52,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Fungsi untuk mereset tampilan informasi absensi (PENTING: Semua menjadi '-')
   function resetDetectedInfo() {
-    detectedName.textContent = "-";
-    detectedId.textContent = "-";
-    detectedTime.textContent = "-";
-    if (detectedDate) detectedDate.textContent = "-";
-    if (detectedKeterangan) detectedKeterangan.textContent = "-";
+    detectedName.textContent = "0";
+    detectedId.textContent = "0";
+    detectedTime.textContent = "0";
+    if (detectedDate) detectedDate.textContent = "0";
+    if (detectedKeterangan) detectedKeterangan.textContent = "0";
   }
 
   // Fungsi logik perhitungan status absensi (Tidak diubah)
@@ -246,7 +246,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           const latestRecord = attendanceRecords.find(
             (record) =>
               record.idNumber === bestMatch.idNumber && record.date === todayISO
-          ) || { time: "-", status: "Sudah Absen" };
+          ) || { time: "0", status: "Sudah Absen" };
 
           detectedName.textContent = bestMatch.fullName;
           // *** PERBAIKAN DI SINI: Menggunakan idNumber ***
@@ -395,7 +395,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           (record) =>
             record.idNumber === registeredFace.idNumber &&
             record.date === todayISO
-        ) || { time: "-", status: "Sudah Absen" };
+        ) || { time: "0", status: "Sudah Absen" };
 
         detectedName.textContent = registeredFace.fullName;
         detectedId.textContent = registeredFace.idNumber;

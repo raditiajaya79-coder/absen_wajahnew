@@ -273,18 +273,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   exportJsonButton.addEventListener("click", () => {
     const dataStr = JSON.stringify(registeredFaces, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
+    const blob = new Blob([dataStr], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `facelite_registered_faces_export_${new Date()
       .toISOString()
-      .slice(0, 10)}.json`;
+      .slice(0, 10)}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    alert("Data wajah berhasil diexport sebagai JSON!");
+    alert("Data wajah berhasil diexport sebagai TXT!");
   });
 
   clearAllFacesButton.addEventListener("click", () => {

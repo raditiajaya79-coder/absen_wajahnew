@@ -31,16 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 attendanceRecords: attendanceRecords
             };
             const dataStr = JSON.stringify(dataToExport, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
+            const blob = new Blob([dataStr], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `facelite_data_export_${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = `facelite_data_export_${new Date().toISOString().slice(0, 10)}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            alert('Data berhasil diexport sebagai JSON!');
+            alert('Data berhasil diexport sebagai TXT!');
         }
     });
 
