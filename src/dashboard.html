@@ -345,11 +345,11 @@
                 const notAttendedCount = registeredFaces.length - todayAttendanceRecords.length;
 
                 // Update all dashboard elements
-                document.getElementById('totalRegisteredFacesOverview').textContent = registeredFaces.length;
-                document.getElementById('attendedToday').textContent = attendedCount;
-                document.getElementById('lateToday').textContent = lateCount;
-                document.getElementById('notAttendedToday').textContent = notAttendedCount;
-                document.getElementById('totalRegisteredFacesFooter').textContent = registeredFaces.length;
+                document.getElementById('totalRegisteredFacesOverview').textContent = registeredFaces.length ?? 0;
+                document.getElementById('attendedToday').textContent = attendedCount ?? 0;
+                document.getElementById('lateToday').textContent = lateCount ?? 0;
+                document.getElementById('notAttendedToday').textContent = notAttendedCount ?? 0;
+                document.getElementById('totalRegisteredFacesFooter').textContent = registeredFaces.length ?? 0;
 
                 // Update lists and buttons
                 const showAllAttendedBtn = document.getElementById('showAllAttended');
@@ -504,15 +504,15 @@
                     const notAttendedCount = registeredFaces.length - todayAttendanceRecords.length;
 
                     // Update attendance chart
-                    attendanceChart.data.datasets[0].data = [attendedCount, lateCount, notAttendedCount];
+                    attendanceChart.data.datasets[0].data = [attendedCount ?? 0, lateCount ?? 0, notAttendedCount ?? 0];
                     attendanceChart.update();
 
                     // Update role chart
                     const roleCounts = {
-                        siswa: registeredFaces.filter(f => f.role === 'Siswa').length,
-                        guru: registeredFaces.filter(f => f.role === 'Guru').length,
-                        staff: registeredFaces.filter(f => f.role === 'Staff').length,
-                        lainnya: registeredFaces.filter(f => f.role !== 'Siswa' && f.role !== 'Guru' && f.role !== 'Staff').length
+                        siswa: registeredFaces.filter(f => f.role === 'Siswa').length ?? 0,
+                        guru: registeredFaces.filter(f => f.role === 'Guru').length ?? 0,
+                        staff: registeredFaces.filter(f => f.role === 'Staff').length ?? 0,
+                        lainnya: registeredFaces.filter(f => f.role !== 'Siswa' && f.role !== 'Guru' && f.role !== 'Staff').length ?? 0
                     };
                     roleChart.data.datasets[0].data = [
                         roleCounts.siswa,
@@ -541,7 +541,7 @@
                     logoutButton.addEventListener('click', function () {
                         // Clear any session data if needed
                         // For now, we'll just redirect to index.html
-                        window.location.href = '../absen_wajahnew.html';
+                        window.location.href = '../index.html';
                     });
                 }
             });
